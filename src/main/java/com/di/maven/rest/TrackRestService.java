@@ -1,7 +1,12 @@
 package com.di.maven.rest;
 
+import java.text.DateFormat;
+import java.text.DateFormatSymbols;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Date;
 
 import javax.ejb.EJB;
 import javax.json.Json;
@@ -9,6 +14,7 @@ import javax.json.JsonArrayBuilder;
 import javax.json.JsonObject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -22,6 +28,8 @@ import javax.ws.rs.core.Response;
 import com.di.maven.domain.Disc;
 import com.di.maven.domain.Track;
 import com.di.maven.service.DiscManager;
+import com.di.maven.service.TrackManager;
+import com.di.maven.util.TrackParam;
 
 
 //import com.di.maven.domain.Book;
@@ -30,64 +38,85 @@ import com.di.maven.service.DiscManager;
 //import com.example.restejbjpa.service.BookManager;
 //import com.di.maven.service.PersonManager;
 
-@Path("disc")
-public class DiscRestService {
+@Path("track")
+public class TrackRestService {
 
+	@EJB
+	TrackManager tm;
 	@EJB
 	DiscManager dm;
 	
+	@SuppressWarnings("deprecation")
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response addDisc(Disc disc){
-		dm.addDisc(disc);
+	public Response addTrack(TrackParam trackParam){
+		//tm.addTrack(track);
+		Track track = new Track();
+		Disc disc = dm.getDisc(trackParam.getDiscId());
+		//disc.addTrack(track);
+		//track.setDisc(disc);
+		track.setTitle(trackParam.getTitle());
+
+		SimpleDateFormat sdf = new SimpleDateFormat("mm:ss");
+		Date dur;
+		try {
+			dur = sdf.parse(trackParam.getDuration());
+		} catch(Exception e) {
+			dur = new Date(0, 0, 0, 0, 0, 0);
+		}
+		track.setDuration(dur);
+		
+		dm.addTrackToDisc(disc, track);
+		tm.addTrack(track);
+		
 		
 		return Response.status(Response.Status.CREATED).build();	
 	}
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<Disc> getAll(){
-		return dm.getAll();
+	public List<Track> getAll(){
+		return tm.getAll();
 	}
 	
 	@GET
-	@Path("/{title}")
+	@Path("/{discId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<Disc> getAllDiscByTitle(@PathParam("title") String title) {
-		return dm.getDisc(title);
-	}
-	
-	@GET
-	@Path("/pattern/{titlePattern}")
-	@Produces(MediaType.APPLICATION_JSON)
-	public List<Disc> getAllTitle(@PathParam("titlePattern") String titlePattern){
-		String pattern = "%" + titlePattern + "%";
-		return dm.getAllTitle(pattern);
+	public List<Track> getAllByDisc(@PathParam("discId") long discId) {
+		return tm.getByDiscId(discId);
 	}
 	
 	@PUT 
 	@Path("/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response editTrack(@PathParam("id") long id, Disc disc) {
-		disc.setId(id);
-		dm.editDisc(disc);
+	public Response editTrack(@PathParam("id") long id, Track track) {
+		track.setId(id);
+		tm.editTrack(track);
 		return Response.status(Response.Status.OK).build();
 	}
 	
 	@DELETE
 	@Path("/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response deleteDisc(@PathParam("id") long id) {
-		dm.deleteDisc(id);
+	public Response deleteTrack(@PathParam("id") long id) {
+		tm.deleteTrack(id);
 		return Response.status(Response.Status.OK).build();
 	}
 	
 	@DELETE
-	@Path("/deleteAll")
-	public Response deleteAllDisc() {
-		dm.deleteAllDisc();
+	@Path("deleteAll")
+	public Response deleteAllTracks() {
+		tm.deleteAllTracks();
 		return Response.status(Response.Status.OK).build();
 	}
+	
+	/*@GET
+	@Path("/{titlePattern}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public List<Disc> getAllTitle(@PathParam("titlePattern") String titlePattern){
+		String pattern = "%" + titlePattern + "%";
+		return tm.getAllTitle(pattern);
+	}*/
 	
 	/*@POST
 	@Path("/addTrack")
@@ -98,5 +127,3 @@ public class DiscRestService {
 		return Response.status(Response.Status.CREATED).build();
 	}*/
 }
-
-

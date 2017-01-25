@@ -17,7 +17,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Entity
 @NamedQueries({ 
 	@NamedQuery(name = "disc.all", query = "Select d from Disc d"),
-	@NamedQuery(name = "disc.all.titlePattern", query = "Select d from Disc d where d.title like :titlePattern")
+	@NamedQuery(name = "disc.all.titlePattern", query = "Select d from Disc d where d.title like :titlePattern"),
+	@NamedQuery(name = "disc.all.byTitle", query = "Select d from Disc d where d.title = :title")
 	//@NamedQuery(name = "book.delete.all", query = "Delete from Book "),
 	//@NamedQuery(name = "book.findByYop", query = "Select b from Book b where b.yop = :yop"),
 	//@NamedQuery(name = "bookAuthor.findByAthorFirstName",
@@ -25,11 +26,16 @@ import javax.xml.bind.annotation.XmlRootElement;
 })
 @XmlRootElement
 public class Disc {
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)	
 	private long id;
 	
 	private String title;
 	
 	private int yop;
+	
+	//@OneToMany(mappedBy="disc", cascade = CascadeType.ALL, fetch=FetchType.EAGER)
+	//private List<Track> tracks = new ArrayList<>();
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)	
@@ -57,5 +63,22 @@ public class Disc {
 		this.yop = yop;
 	}
 	
+	//public List<Track> getTracks() {
+	//	return tracks;
+	//}
+	
+	public void addTrack(Track track) {
+		//if(!getTracks().contains(track)){
+			//getTracks().add(track);
+			//if(track.getDisc() != null) {
+			//	track.getDisc().getTracks().remove(track);
+			//}
+			track.setDisc(this);
+		//}			
+	}
+	
+	//public void setTracks(List<Track> tracks) {
+	//	this.tracks = tracks;
+	//}
 	
 }
