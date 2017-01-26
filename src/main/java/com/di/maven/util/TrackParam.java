@@ -1,5 +1,6 @@
 package com.di.maven.util;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -8,7 +9,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class TrackParam {
 	private long DiscId;
 	private String title;
-	private String duration;
+	private BigDecimal duration;
 	
 	public long getDiscId() {
 		return DiscId;
@@ -22,10 +23,10 @@ public class TrackParam {
 	public void setTitle(String title) {
 		this.title = title;
 	}
-	public String getDuration() {
+	public BigDecimal getDuration() {
 		return duration;
 	}
-	public void setDuration(String duration) {
+	public void setDuration(BigDecimal duration) {
 		this.duration = duration;
 	}
 }

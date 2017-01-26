@@ -46,7 +46,6 @@ public class TrackRestService {
 	@EJB
 	DiscManager dm;
 	
-	@SuppressWarnings("deprecation")
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response addTrack(TrackParam trackParam){
@@ -57,14 +56,14 @@ public class TrackRestService {
 		//track.setDisc(disc);
 		track.setTitle(trackParam.getTitle());
 
-		SimpleDateFormat sdf = new SimpleDateFormat("mm:ss");
-		Date dur;
-		try {
-			dur = sdf.parse(trackParam.getDuration());
-		} catch(Exception e) {
-			dur = new Date(0, 0, 0, 0, 0, 0);
-		}
-		track.setDuration(dur);
+		//SimpleDateFormat sdf = new SimpleDateFormat("mm:ss");
+		//Date dur;
+		//try {
+		//	dur = sdf.parse(trackParam.getDuration());
+		//} catch(Exception e) {
+		//	dur = new Date(0, 0, 0, 0, 0, 0);
+		//}
+		track.setDuration(trackParam.getDuration());
 		
 		dm.addTrackToDisc(disc, track);
 		tm.addTrack(track);
@@ -80,7 +79,14 @@ public class TrackRestService {
 	}
 	
 	@GET
-	@Path("/{discId}")
+	@Path("/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Track getById(@PathParam("id") long id){
+		return tm.getTrack(id);
+	}
+	
+	@GET
+	@Path("/bydisc/{discId}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<Track> getAllByDisc(@PathParam("discId") long discId) {
 		return tm.getByDiscId(discId);

@@ -1,5 +1,6 @@
 package com.di.maven.domain;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,13 +16,21 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.DecimalMax;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Digits;
 import javax.xml.bind.annotation.XmlRootElement;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 
 @XmlRootElement
 @Entity
+@Table(uniqueConstraints = @UniqueConstraint(columnNames={"DISC_ID", "TITLE"})) //@UniqueConstraint(columnNames={"author_id", "number"})})
 @NamedQueries({
 	@NamedQuery(name = "track.getAll", query = "Select t from Track t"),
 	@NamedQuery(name="track.deleteAll", query="Delete from Track"),	
@@ -37,8 +46,14 @@ public class Track {
 	
 	private String title;
 	
-	@Temporal(TemporalType.TIME)
-	private Date duration;
+	//@Temporal(TemporalType.TIME)
+	//@JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy mm:ss")
+	
+
+	@DecimalMax("59.59")
+	@DecimalMin("0.01")
+	@Digits(integer=2, fraction=2)
+	private BigDecimal duration;
 
 	public String getTitle() {
 		return title;
@@ -58,11 +73,11 @@ public class Track {
 		this.id = id;
 	}
 
-	public Date getDuration() {
+	public BigDecimal getDuration() {
 		return duration;
 	}
 
-	public void setDuration(Date duration) {
+	public void setDuration(BigDecimal duration) {
 		this.duration = duration;
 	}
 	
